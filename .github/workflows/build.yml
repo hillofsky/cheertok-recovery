@@ -15,6 +15,9 @@ jobs:
         with:
           python-version: '3.11'
       - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
       - run: sdkmanager 'platforms;android-31' 'build-tools;31.0.0'
       - run: python scripts/build.py
       - uses: actions/upload-artifact@v4
