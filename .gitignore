@@ -1,0 +1,11 @@
+.local/
+build/
+local.properties
+*.apk
+*.idsig
+*.keystore
+*.jks
+*.log
+__pycache__/
+.idea/
+*.iml

@@ -1,0 +1,12 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="local.cheertok.probe" android:versionCode="6" android:versionName="0.6">
+ <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="31"/>
+ <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+ <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation"/>
+ <uses-permission android:name="moe.shizuku.manager.permission.API_V23"/>
+ <queries><package android:name="moe.shizuku.privileged.api"/></queries>
+ <application android:label="치어톡 복구" android:debuggable="true" android:theme="@android:style/Theme.Material.Light.NoActionBar">
+  <meta-data android:name="moe.shizuku.client.V3_SUPPORT" android:value="true"/>
+  <provider android:name="rikka.shizuku.ShizukuProvider" android:authorities="local.cheertok.probe.shizuku" android:multiprocess="false" android:enabled="true" android:exported="true" android:permission="android.permission.INTERACT_ACROSS_USERS_FULL"/>
+  <activity android:name=".ControlActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity>
+ </application>
+</manifest>
