@@ -78,7 +78,10 @@ public class ShellProbe extends MainActivity {
       probe.launchIntent.putExtra("refresh", true);
     }
     if (args.length > 1 && "uhid".equals(args[1])) {
-      probe.bridge = new UhidBridge();
+      probe.bridge = new UhidBridge(shell, args.length >= 5
+          ? new RecoveryOptions(Integer.parseInt(args[2]), Integer.parseInt(args[3]),
+              Integer.parseInt(args[4]))
+          : new RecoveryOptions(RecoveryOptions.DEFAULT_FLAGS, 100, 100));
       probe.launchIntent.putExtra("refresh", true);
     }
     probe.out("SHELL_PROBE_START");

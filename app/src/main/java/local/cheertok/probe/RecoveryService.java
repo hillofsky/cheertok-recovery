@@ -8,6 +8,7 @@ public class RecoveryService extends Binder {
   static final String TOKEN = "local.cheertok.recovery";
   final String apk;
   java.lang.Process worker;
+  RecoveryOptions activeOptions;
   String status = "꺼짐";
 
   public RecoveryService(Context context) {
@@ -15,15 +16,33 @@ public class RecoveryService extends Binder {
     attachInterface(null, TOKEN);
   }
 
-  synchronized String start() {
-    if (worker != null && worker.isAlive()) return status;
+  synchronized String start(RecoveryOptions options) {
+    if (worker != null && worker.isAlive()) {
+      if (activeOptions.flags == options.flags && activeOptions.travel == options.travel
+          && activeOptions.inertia == options.inertia) return status;
+      worker.destroy();
+      try {
+        if (!worker.waitFor(500, java.util.concurrent.TimeUnit.MILLISECONDS)) {
+          worker.destroyForcibly();
+          if (!worker.waitFor(500, java.util.concurrent.TimeUnit.MILLISECONDS)) {
+            return "이전 복구를 종료하지 못했습니다. 다시 시도해주세요.";
+          }
+        }
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        return "설정 적용이 중단됐습니다";
+      }
+    }
     try {
       ProcessBuilder pb =
           new ProcessBuilder(
-              "/system/bin/app_process", "/", "local.cheertok.probe.ShellProbe", "auto", "uhid");
+              "/system/bin/app_process", "/", "local.cheertok.probe.ShellProbe", "auto", "uhid",
+              Integer.toString(options.flags), Integer.toString(options.travel),
+              Integer.toString(options.inertia));
       pb.environment().put("CLASSPATH", apk);
       pb.redirectErrorStream(true);
       worker = pb.start();
+      activeOptions = options;
       status = "연결 중…";
       java.lang.Process current = worker;
       new Thread(
@@ -98,7 +117,7 @@ public class RecoveryService extends Binder {
     }
     data.enforceInterface(TOKEN);
     String result;
-    if (code == 1) result = start();
+    if (code == 1) result = start(new RecoveryOptions(data.readInt(), data.readInt(), data.readInt()));
     else if (code == 2) result = stop();
     else if (code == 3) {
       synchronized (this) {
